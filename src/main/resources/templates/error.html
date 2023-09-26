@@ -1,0 +1,19 @@
+<!--duplicate resort name error-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error</title>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h1>Error</h1>
+  <p th:text="${errorMessage}"></p>
+  <a th:href="@{/resort}" class="btn btn-primary">Back to Resorts</a>
+</div>
+
+</body>
+</html>

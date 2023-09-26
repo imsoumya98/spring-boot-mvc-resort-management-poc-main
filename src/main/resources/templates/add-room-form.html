@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Room</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<h1>Rooms of the resort</h1>
+<p>
+    Resort ID: <span th:text="${resort.id}"></span><br>
+    Name: <span th:text="${resort.name}"></span>
+</p>
+
+<h1>Add Rooms</h1>
+
+<form th:action="@{/resort/{resortId}/rooms(resortId=${resortId})}" method="post">
+    <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+
+    <div>
+        <label for="description">Description Code:</label>
+        <input type="text" id="description" name="description" required />
+    </div>
+    <br>
+
+
+    <button type="submit">Add Room</button>
+</form>
+
+<br>
+<br>
+<a th:href="@{/resort/{resortId}/roomlist(resortId=${resort.id})}">Back to room list</a>
+
+</body>
+</html>

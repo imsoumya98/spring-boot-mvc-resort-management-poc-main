@@ -1,0 +1,215 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <title>List Resorts</title>
+
+  <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.css"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous"
+  />
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <!--<a class="navbar-brand" href="#" th:href="@{/}">Registration</a>-->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/registration}">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/logout}">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container">
+
+  <h3>List Resorts</h3>
+
+ <div sec:authorize="isAuthenticated()">
+    Welcome <b><span sec:authentication="name">Username</span></b> &nbsp;
+    <i><span sec:authentication="principal.authorities">Roles</span></i>
+  </div>
+  <hr />
+  <a th:href="@{/addResortForm}" class="btn btn-primary" sec:authorize="hasRole('ROLE_ADMIN')">Add Resort</a>
+  <br />
+  <br />
+
+  <!-- Dropdown list of states -->
+  <div class="form-group">
+    <label for="stateSelect">Select a State:</label>
+    <select class="form-control col-4 mb-4" id="stateSelect" name="state" onchange="loadPageByState(this.value)">
+      <option value="" selected disabled>Select a State</option>
+        <option th:each="state : ${#lists.sort(stateCityJson.keySet())}" th:value="${state}" th:text="${state}"></option>
+    </select>
+  </div>
+
+  <!-- Dropdown list of cities -->
+
+  <div class="form-group">
+    <label for="citySelect">Select a City:</label>
+    <select class="form-control col-4 mb-4" id="citySelect" name="city" onchange="loadPageByCity(this.value)">
+      <option value="" selected disabled>Select a City</option>
+        <option th:each = "city :${citiesForSelectedState}" th:value = "${city}" th:text="${city}"></option>
+    </select>
+  </div>
+    <!--<button type="button" class="btn btn-primary" onclick="filterByResort()">Filter</button>-->
+  <br />
+  <br />
+
+  <table class="table table-bordered table-striped" id="resortTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th >Rooms</th>
+      <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="resort: ${resorts}" data-state="{resort.state}" data-city="${resort.city}">
+      <td th:text="${resort.id}" />
+      <td th:text="${resort.name}" />
+      <td th:text="${resort.address}" />
+      <td>
+        <a th:href="@{/resort/{resortId}/roomlist(resortId=${resort.id})}">Room</a>
+      </td>
+        <td sec:authorize="hasRole('ROLE_ADMIN')">
+        <a th:href="@{/updateResortForm/{id}(id=${resort.id})}"
+                class="btn btn-info">Update</a>
+
+        <a th:href="@{/deleteResort/{id}(id=${resort.id})}"
+           class="btn btn-danger ml-2"
+           onclick="return confirm('Are you sure you want to delete this resort?');">Delete</a>
+
+      </td>
+      </tr>
+      </tbody>
+      </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+        type="text/javascript"
+        src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"
+></script>
+
+<!--<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        var dataTable = $("#resortTable").DataTable({
+            paging: false,
+        });
+
+
+
+        // Populate city dropdown based on selected state
+        $("#stateSelect").on("change", function () {
+            var selectedState = $(this).val();
+            var citySelect = $("#citySelect");
+            // Clear previous options
+            citySelect.empty();
+
+
+
+            // Populate options based on selected state
+            if (selectedState && stateCityJson[selectedState]) {
+                $.each(stateCityJson[selectedState], function (index, city) {
+                    citySelect.append($('<option>', {
+                        value: city,
+                        text: city
+                    }));
+                });
+            }
+        });
+
+
+
+        // Function to filter the table based on selected state and city
+        function filterByResort() {
+            var selectedState = $("#stateSelect").val();
+            var selectedCity = $("#citySelect").val();
+            // Clear previous search filters
+            dataTable.search("").draw();
+
+
+
+            // Apply new filters
+            if (selectedState) {
+                dataTable.column(2).search(selectedState).draw();
+            }
+            if (selectedCity) {
+                dataTable.column(3).search(selectedCity).draw();
+            }
+        }
+        // Attach the filter function to the "Filter" button click event
+        $("#filterButton").on("click", function () {
+            filterByResort();
+        });
+    });
+</script>-->
+<script>
+
+    function loadPageByState(selectedState) {
+        if (selectedState) {
+        console.log("SelectedState:"+selectedState);
+        var url = '/resort?selectedState=' + encodeURIComponent(selectedState);
+          window.location.href = '/resort?selectedState=' + encodeURIComponent(selectedState);
+        }
+       }
+     function loadPageByCity(selectedCity) {
+        var selectedState = document.getElementById("stateSelect").value;
+        if (selectedCity) {
+        console.log("SelectedCity:"+selectedCity);
+         var url = '/resort?selectedState=' + encodeURIComponent(selectedState) + '&selectedCity=' + encodeURIComponent(selectedCity);
+              window.location.href = url;
+          }
+         }
+      // Load the page with the selected state and city if provided in the URL
+          window.onload = function () {
+          var urlParams = new URLSearchParams(window.location.search);
+          var selectedState = urlParams.get('selectedState');
+          var selectedCity = urlParams.get('selectedCity');
+          if (selectedState) {
+            document.getElementById("stateSelect").value = selectedState;
+            }
+          if (selectedCity) {
+             document.getElementById("citySelect").value = selectedCity;
+             }
+           }
+
+  </script>
+
+<script>
+    $(document).ready(function () {
+        $("#resortTable").DataTable({
+            aoColumnDefs: [
+                {
+                    bSortable: false,
+                    aTargets: [-1],
+                },
+            ],
+            pageLength: 5, // Set the number of rows per page
+            stateSave: true, //to save the present state
+<!--            bPaginate: false, // Hide pagination controls-->
+        });
+    });
+</script>
+
+</body>
+</html>

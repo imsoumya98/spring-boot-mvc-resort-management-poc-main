@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Resort Rooms</title>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.css"/>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous"/>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Resort Rooms</h1>
+    <p>
+        Resort ID: <span th:text="${resort.id}"></span><br> Name: <span
+            th:text="${resort.name}"></span>
+    </p>
+
+    <h3>List Rooms</h3>
+
+    <hr/>
+    <a th:href="@{/resort/{resortId}/rooms(resortId=${resortId})}" class="btn btn-primary"
+       sec:authorize="hasRole('ROLE_ADMIN')">Add Room</a>
+    <br/>
+    <br/>
+    <table class="table table-bordered table-striped" id="roomTable">
+        <thead>
+        <tr>
+            <th>Room ID</th>
+            <th>Descriptions</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${rooms}">
+            <td th:text="${room.id}"></td>
+            <td th:text="${room.description}"></td>
+            <td>
+                <a th:href="@{/resort/{resortId}/rooms/{roomId}/edit(resortId=${resort.id}, roomId=${room.id})}"
+                   class="btn btn-info"
+                   sec:authorize="hasRole('ROLE_ADMIN')">Update</a>
+                <a th:href="@{/resort/{resortId}/rooms/{roomId}/delete(resortId=${resort.id}, roomId=${room.id})}"
+                   class="btn btn-danger ml-2"
+                   onclick="return confirm('Are you sure you want to delete this room?')"
+                   sec:authorize="hasRole('ROLE_ADMIN')">Delete</a>
+
+                <!--<form th:action="@{/resort/{resortId}/rooms/{roomId}/delete(resortId=${resort.id}, roomId=${room.id})}"
+                      method="post" onsubmit="return confirm('Are you sure you want to delete this room?');">
+                    <button type="submit" class="btn btn-danger ml-2">Delete</button>
+                </form>-->
+
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr/>
+<a th:href="@{/list}">Back to Resort list</a>
+
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/bs4/dt-1.10.25/datatables.min.js"></script>
+<!--<script>
+		$(document).ready(function() {
+			$("#roomTable").DataTable({
+				'aoColumnDefs' : [ {
+					'bSortable' : false,
+					'aTargets' : [ -1 ]
+				/* 1st one, start by the right */
+				} ]
+			});
+		})
+
+
+</script>-->
+
+<script>
+    $(document).ready(function () {
+        $("#roomTable").DataTable({
+            aoColumnDefs: [
+                {
+                    bSortable: false,
+                    aTargets: [-1],
+                },
+            ],
+            pageLength: 3, // Set the number of rows per page
+        });
+    });
+</script>
+
+
+</body>
+</html>
+

@@ -1,0 +1,91 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Add Resort</title>
+
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous"
+  />
+</head>
+<body>
+<div class="container">
+  <h3>Add New Resort</h3>
+  <hr />
+
+  <form th:action="@{/saveResort}" th:object="${resort}" method="POST" id="resortForm">
+
+    <!-- Dropdown list of states -->
+    <div class="form-group">
+      <label for="stateSelect">Select a State:</label>
+      <select class="form-control col-4 mb-4" id="stateSelect" name="state" onchange="loadPageByState(this.value)">
+        <option value="" selected disabled>Select a State</option>
+        <option th:each="state : ${#lists.sort(stateCityJson.keySet())}" th:value="${state}" th:text="${state}"></option>
+      </select>
+    </div>
+
+    <!-- Dropdown list of cities -->
+    <div class="form-group">
+      <label for="citySelect">Select a City:</label>
+      <select class="form-control col-4 mb-4" id="citySelect" name="city" onchange="loadPageByCity(this.value)">
+        <option value="" selected disabled>Select a City</option>
+        <option th:each = "city :${citiesForSelectedState}" th:value = "${city}" th:text="${city}"></option>
+      </select>
+    </div>
+    <input
+            type="text"
+            th:field="*{name}"
+            class="form-control col-4 mb-4"
+            placeholder="Enter Name"
+    />
+    <input
+            type="text"
+            th:field="*{address}"
+            class="form-control col-4 mb-4"
+            placeholder="Enter address"
+    />
+
+
+    <button type="submit" class="btn btn-primary col-2">Save</button>
+    <input type="hidden" th:field="*{id}" />
+  </form>
+
+  <script>
+
+    function loadPageByState(selectedState) {
+        if (selectedState) {
+        console.log("SelectedState:"+selectedState);
+        var url = '/addResortForm?selectedState=' + encodeURIComponent(selectedState);
+          window.location.href = '/addResortForm?selectedState=' + encodeURIComponent(selectedState);
+        }
+       }
+     function loadPageByCity(selectedCity) {
+        var selectedState = document.getElementById("stateSelect").value;
+        if (selectedCity) {
+        console.log("SelectedCity:"+selectedCity);
+         var url = '/addResortForm?selectedState=' + encodeURIComponent(selectedState) + '&selectedCity=' + encodeURIComponent(selectedCity);
+              window.location.href = url;
+          }
+         }
+      // Load the page with the selected state and city if provided in the URL
+          window.onload = function () {
+          var urlParams = new URLSearchParams(window.location.search);
+          var selectedState = urlParams.get('selectedState');
+          var selectedCity = urlParams.get('selectedCity');
+          if (selectedState) {
+            document.getElementById("stateSelect").value = selectedState;
+            }
+          if (selectedCity) {
+             document.getElementById("citySelect").value = selectedCity;
+             }
+           }
+
+  </script>
+  <hr />
+  <a th:href="@{/list}">Back to list</a>
+</div>
+
+
+</body>
+</html>
